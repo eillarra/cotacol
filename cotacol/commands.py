@@ -1,6 +1,13 @@
 import click
 
+from cotacol.extensions import cache
 from .data.parser import parse_cotacol_data
+
+
+@click.command("clear_cache")
+def clear_cache():
+    """Empties application’s cache."""
+    cache.clear()
 
 
 @click.command("parse")

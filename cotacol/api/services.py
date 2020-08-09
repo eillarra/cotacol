@@ -7,7 +7,7 @@ from cotacol.extensions import cache
 from .models import Climb
 
 
-@cache.cached()
+@cache.cached(key_prefix="all_climbs")
 def get_climbs() -> Dict[int, Climb]:
     collection = get_geojson()
     cols = {}
@@ -18,7 +18,7 @@ def get_climbs() -> Dict[int, Climb]:
     return cols
 
 
-@cache.cached()
+@cache.cached(key_prefix="geojson")
 def get_geojson() -> FeatureCollection:
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
