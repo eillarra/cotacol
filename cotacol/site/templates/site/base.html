@@ -1,0 +1,44 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <link type="text/css" rel="stylesheet" href="{{ url_for('site.static', filename='vendor/quasar@1.12.13/quasar.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,600|Material+Icons">
+    <style>[v-cloak] { display: none; }</style>
+    {% block styles %}{% endblock %}
+    <title>COTACOL</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block head_scripts %}{% endblock %}
+  </head>
+
+  <body>
+    {% block layout %}{% endblock %}
+    {% block vue_templates %}{% endblock %}
+
+    {% if DEBUG %}
+      <script src="{{ url_for('site.static', filename='vendor/vue@2.6.11/vue.js') }}"></script>
+      <script src="{{ url_for('site.static', filename='vendor/vue-router@3.4.3/vue-router.js') }}"></script>
+      <script src="{{ url_for('site.static', filename='vendor/vuex@3.5.1/vuex.js') }}"></script>
+      <script src="{{ url_for('site.static', filename='vendor/quasar@1.12.13/quasar.umd.js') }}"></script>
+    {% else %}
+      {% assets output='site/__bundle__/vue.js',
+        'site/vendor/quasar@1.12.13/quasar.ie.polyfills.umd.min.js',
+        'site/vendor/vue@2.6.11/vue.min.js',
+        'site/vendor/vue-router@3.4.3/vue-router.min.js',
+        'site/vendor/vuex@3.5.1/vuex.min.js',
+        'site/vendor/quasar@1.12.13/quasar.umd.min.js' %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+      {% endassets %}
+    {% endif %}
+
+    {% assets filters='rjsmin', output='site/__bundle__/base.js',
+      'site/vendor/axios@0.19.2/axios.min.js',
+      'site/vendor/underscore@1.10.2/underscore.min.js',
+      'site/js/base.js' %}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

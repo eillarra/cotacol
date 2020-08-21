@@ -1,0 +1,59 @@
+{% extends "site/base.html" %}
+
+
+{% block styles %}
+  <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+  {% assets filters='rjsmin', output='site/__bundle__/core/index.js',
+    'site/vendor/polyline@0.2.0/polyline.js',
+    'site/js/components/map.components.js',
+    'site/js/index.js' %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+{% endblock %}
+
+{% block layout %}
+  <q-layout id="vue" view="hHh lpR lfr" v-cloak>
+
+    <q-header bordered class="bg-white q-py-sm">
+      <q-toolbar class="text-dark">
+        <q-btn dense flat round icon="menu" @click="visibleMenu = !visibleMenu"></q-btn>
+        <q-toolbar-title>
+          <img src="{{ url_for('site.static', filename='images/cotacol.svg') }}" height="16px">
+        </q-toolbar-title>
+        <q-space></q-space>
+        {% if current_user.is_authenticated %}
+          <q-btn flat round>
+            <q-avatar>
+              <img src="{{ current_user.profile_picture }}">
+            </q-avatar>
+            <q-menu class="width: 200px" :offset="[0, 25]">
+              <div class="q-pa-md">
+                <q-btn flat type="a" href="{{ url_for('auth.logout') }}" color="grey-7"
+                  label="Logout"></q-btn>
+              </div>
+            </q-menu>
+          </q-btn>
+        {% else %}
+          <q-btn type="a" href="{{ url_for('auth.login') }}" unelevated color="deep-orange" class="q-mr-sm">
+            <span>Connect <span v-show="$q.screen.gt.sm">with </span> Strava</span></q-btn>
+        {% endif %}
+      </q-toolbar>
+    </q-header>
+
+    <q-drawer show-if-above v-model="visibleMenu" side="left" bordered :width="400" show-if-above>
+      <router-view v-show="$route.name == 'climbs'"></router-view>
+      <router-view name="detail"></router-view>
+    </q-drawer>
+
+    <q-page-container>
+      <q-page class="q-px-md q-py-lg" :class="{'q-px-lg': $q.screen.gt.xs}">
+        <cotacol-map :climbs="filteredClimbs"></cotacol-map>
+      </q-page>
+    </q-page-container>
+
+  </q-layout>
+{% endblock %}

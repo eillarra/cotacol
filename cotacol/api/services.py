@@ -1,21 +1,8 @@
 import os
 
 from geojson import FeatureCollection, load as load_geojson  # type: ignore
-from typing import Dict
 
 from cotacol.extensions import cache
-from .models import Climb
-
-
-@cache.cached(key_prefix="all_climbs")
-def get_climbs() -> Dict[int, Climb]:
-    collection = get_geojson()
-    cols = {}
-
-    for feature in collection.features:
-        cols[feature.id] = Climb.from_feature(feature)
-
-    return cols
 
 
 @cache.cached(key_prefix="geojson")
