@@ -8,7 +8,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .api.views import api
 from .auth.views import auth
-from .commands import clear_cache, update_data
+from .commands import clear_cache, update_data, sync_db
 from .extensions import assets, cache, db, login_manager, migrate, oauth
 from .site.views import site
 
@@ -39,6 +39,7 @@ def register_commands(app):
     """Register Click commands."""
     app.cli.add_command(clear_cache)
     app.cli.add_command(update_data)
+    app.cli.add_command(sync_db)
 
 
 def register_extensions(app):

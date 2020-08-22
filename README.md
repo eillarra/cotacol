@@ -2,6 +2,7 @@ Cotacol
 =======
 
 [![github-tests-badge]][github-tests]
+[![github-mypy-badge]][github-mypy]
 [![codecov-badge]][codecov]
 [![license-badge]](LICENSE)
 
@@ -45,6 +46,8 @@ Tab size is 4 spaces. Maximum line length is 120. You should run `black` before 
 [codecov]: https://codecov.io/gh/eillarra/cotacol
 [codecov-badge]: https://codecov.io/gh/eillarra/cotacol/branch/master/graph/badge.svg
 [flask]: https://flask.pocoo.org/
+[github-mypy]: https://github.com/eillarra/cotacol/actions?query=workflow%3A%22mypy%22
+[github-mypy-badge]: https://github.com/eillarra/cotacol/workflows/mypy/badge.svg
 [github-tests]: https://github.com/eillarra/cotacol/actions?query=workflow%3A%22tests%22
 [github-tests-badge]: https://github.com/eillarra/cotacol/workflows/tests/badge.svg
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg

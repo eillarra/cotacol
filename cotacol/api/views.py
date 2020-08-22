@@ -13,10 +13,7 @@ api: Blueprint = Blueprint("api", __name__)
 @api.route("/")
 def index():
     return jsonify(
-        {
-            "climbs": url_for("api.climb_list", _external=True),
-            "geojson": url_for("api.geojson", _external=True),
-        }
+        {"climbs": url_for("api.climb_list", _external=True), "geojson": url_for("api.geojson", _external=True)}
     )
 
 

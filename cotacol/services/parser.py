@@ -4,21 +4,28 @@ import os
 import re
 import requests
 
-from geojson import FeatureCollection  # type: ignore
-from gpxpy import parse as parse_gpx  # type: ignore
+from geojson import FeatureCollection, load as load_geojson  # type: ignore
 from typing import List
 
 from cotacol.extensions import db
 from cotacol.models import Climb
 
 
+LOCATION = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+GPX_PATH = (
+    "https://raw.githubusercontent.com/CotacolHunting/COTACOL-iOS/master/COTACOL/Data/data.gpx"
+    "?token=AAD5UHK7M7QBI7KWOFYVEEC7IDSIW"
+)
+
+
 def update_cotacol_data() -> None:
-    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    """
+    """
     climbs = {}
 
     # Generate initial list of cols from generic list
 
-    with open(os.path.join(__location__, "../data", "cotacol.csv")) as f:
+    with open(os.path.join(LOCATION, "../data", "cotacol.csv")) as f:
         csv_reader = csv.reader(f, delimiter=",")
         next(csv_reader)
         for row in csv_reader:
@@ -34,12 +41,11 @@ def update_cotacol_data() -> None:
                 avg_grade=float(row[4]),
             )
 
-    # Add extra info from Google Maps
-
-    gpx_path = "https://raw.githubusercontent.com/CotacolHunting/COTACOL-iOS/master/COTACOL/Data/data.gpx?token=AAD5UHME7BT7I72PA7WRVLC7IAXFW"
+    # Add extra info from GPX
 
     try:
-        source = requests.get(gpx_path).text.encode("utf-8")
+        from gpxpy import parse as parse_gpx  # type: ignore
+        source = requests.get(GPX_PATH).text.encode("utf-8")
         gpx = parse_gpx(source)
     except Exception as e:
         raise ValueError(e)
@@ -54,21 +60,27 @@ def update_cotacol_data() -> None:
         cotacol_id = int(re.findall(r"\d+", track.name)[0])
         climbs[cotacol_id].gpx_points = gpx_points
 
-    # Update database
+    # Generate GeoJSON file
 
-    for climb in list(climbs.values()):
+    with open(os.path.join(LOCATION, "../data", "cotacol.geojson"), "w") as file:
+        geojson = FeatureCollection([climb.as_feature() for climb in list(climbs.values())])
+        file.write(json.dumps(geojson))
+
+    return
+
+
+def sync_db_climbs() -> None:
+    """
+    """
+    with open(os.path.join(LOCATION, "../data", "cotacol.geojson")) as json_file:
+        collection = load_geojson(json_file)
+
+    for feature in collection.features:
+        gpx_points = [{"lat": g[1], "lon": g[0], "ele": g[2]} for g in feature.geometry.coordinates]
+        climb = Climb(id=feature.id, gpx_points=gpx_points, **feature.properties)
         db.session.merge(climb)
 
     db.session.flush()
     db.session.commit()
-
-    # Generate GeoJSON file that can be downloaded in the app
-
-    with open(os.path.join(__location__, "../data", "cotacol.geojson"), "w") as file:
-        geojson = FeatureCollection(
-            [climb.as_feature() for climb in Climb.query.all()],
-            properties={"title": "COTACOL climbs", "source": "Encyclopedie COTACOL"},
-        )
-        file.write(json.dumps(geojson, indent=2))
 
     return

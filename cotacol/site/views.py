@@ -7,9 +7,7 @@ site: Blueprint = Blueprint("site", __name__, template_folder="templates", stati
 
 @site.route("/favicon.ico")
 def favicon():
-    return send_from_directory(
-        path.join(site.root_path, "static"), "favicon.ico", mimetype="image/vnd.microsoft.icon"
-    )
+    return send_from_directory(path.join(site.root_path, "static"), "favicon.ico", mimetype="image/vnd.microsoft.icon")
 
 
 @site.route("/")

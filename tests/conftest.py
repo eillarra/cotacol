@@ -2,7 +2,10 @@ import os
 import pytest
 import tempfile
 
-from cotacol.app import app
+from cotacol.app import create_app
+
+
+app = create_app()
 
 
 @pytest.fixture

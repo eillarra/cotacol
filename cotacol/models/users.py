@@ -1,6 +1,6 @@
-from flask_login import UserMixin
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql import func
+from flask_login import UserMixin  # type: ignore
+from sqlalchemy.orm.exc import NoResultFound  # type: ignore
+from sqlalchemy.sql import func  # type: ignore
 from typing import Optional
 
 from cotacol.extensions import db

@@ -47,9 +47,13 @@ class Climb(db.Model):
         return d
 
     def as_feature(self) -> Feature:
-        geometry = (
-            LineString([(c["lon"], c["lat"], c["ele"]) for c in self.gpx_points]) if len(self.coordinates) else []
-        )
+        geometry = []
+
+        if self.gpx_points and len(self.gpx_points):
+            geometry = LineString([(c["lon"], c["lat"], c["ele"]) for c in self.gpx_points])
+
         properties = self.as_dict(exclude_coordinates=True)
         properties.pop("id")
+        properties.pop("polyline")
+        properties.pop("url")
         return Feature(id=self.id, geometry=geometry, properties=properties)
