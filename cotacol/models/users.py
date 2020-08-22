@@ -55,6 +55,7 @@ def user_from_token(token: dict, provider: str = "strava") -> Optional[User]:
         account = SocialAccount.query.filter(SocialAccount.provider == provider, SocialAccount.uid == uid).one()
         account.last_login = func.now()
         account.user.username = username
+        account.extra_data = token
     except NoResultFound:
         account = None
         db.session.add(
