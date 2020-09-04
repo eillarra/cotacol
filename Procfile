@@ -1,1 +1,1 @@
-web: gunicorn -b :5000 cotacol.app:create_app()
+web: gunicorn -b :5000 cotacol.wsgi:app
