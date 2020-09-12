@@ -6,10 +6,9 @@ from flask_cors import CORS  # type: ignore
 from flask_talisman import Talisman  # type: ignore
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from .api.views import api
 from .auth.views import auth
-from .commands import clear_cache, update_data, sync_db
-from .extensions import assets, cache, db, login_manager, migrate, oauth
+from .commands import clear_cache
+from .extensions import assets, cache, oauth
 from .site.views import site
 
 
@@ -20,26 +19,25 @@ def create_app(config_object="cotacol.settings") -> Flask:
     app = Flask(__name__, static_folder="_static")
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # type: ignore
     app.config.from_object(config_object)
+
     register_extensions(app)
+    register_oauth_clients()
     register_blueprints(app)
     register_filters(app)
-    register_oauth_clients()
     register_commands(app)
+
     return app
 
 
 def register_blueprints(app) -> None:
     """Register Flask blueprints."""
-    app.register_blueprint(api, url_prefix="/api")
-    app.register_blueprint(auth, url_prefix="/u")
     app.register_blueprint(site)
+    app.register_blueprint(auth, url_prefix="/u")
 
 
 def register_commands(app):
     """Register Click commands."""
     app.cli.add_command(clear_cache)
-    app.cli.add_command(update_data)
-    app.cli.add_command(sync_db)
 
 
 def register_extensions(app):
@@ -60,6 +58,7 @@ def register_extensions(app):
                 "*.mapbox.com",
                 "fonts.googleapis.com",
                 "fonts.gstatic.com",
+                "api.cotacol.cc",
             ]
         },
     )
@@ -75,9 +74,6 @@ def register_extensions(app):
 
     assets.init_app(app)
     cache.init_app(app, config=cache_config)
-    db.init_app(app)
-    login_manager.init_app(app)
-    migrate.init_app(app, db)
     oauth.init_app(app, cache=cache)
 
 

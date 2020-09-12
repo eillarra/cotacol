@@ -16,6 +16,8 @@
 {% endblock %}
 
 {% block layout %}
+  <div id="jwt" data-jwt="{{ session['jwt'] }}"></div>
+
   <q-layout id="vue" view="hHh lpR lfr" v-cloak>
 
     <q-header bordered class="bg-white q-py-sm">
@@ -25,22 +27,19 @@
           <img src="{{ url_for('site.static', filename='images/cotacol.svg') }}" height="16px">
         </q-toolbar-title>
         <q-space></q-space>
-        {% if current_user.is_authenticated %}
-          <q-btn flat round>
-            <q-avatar>
-              <img src="{{ current_user.profile_picture }}">
-            </q-avatar>
-            <q-menu class="width: 200px" :offset="[0, 25]">
-              <div class="q-pa-md">
-                <q-btn flat type="a" href="{{ url_for('auth.logout') }}" color="grey-7"
-                  label="Logout"></q-btn>
-              </div>
-            </q-menu>
-          </q-btn>
-        {% else %}
-          <q-btn type="a" href="{{ url_for('auth.login') }}" unelevated color="deep-orange" class="q-mr-sm">
-            <span>Connect <span v-show="$q.screen.gt.sm">with </span> Strava</span></q-btn>
-        {% endif %}
+        <q-btn v-if="userIsAuthenticated && user" flat round>
+          <q-avatar>
+            <img :src="user.profile_picture">
+          </q-avatar>
+          <q-menu class="width: 200px" :offset="[0, 25]">
+            <div class="q-pa-md">
+              <q-btn flat type="a" href="{{ url_for('auth.logout') }}" color="grey-7"
+                label="Logout"></q-btn>
+            </div>
+          </q-menu>
+        </q-btn>
+        <q-btn v-else type="a" href="{{ url_for('auth.login') }}" unelevated color="deep-orange" class="q-mr-sm">
+          <span>Connect <span v-show="$q.screen.gt.sm">with </span> Strava</span></q-btn>
       </q-toolbar>
     </q-header>
 

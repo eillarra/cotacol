@@ -28,6 +28,7 @@ Vue.component('cotacol-climb-points', {
 
 var Store = new Vuex.Store({
   state: {
+    jwt: JSON.parse(document.querySelector('#jwt').dataset.jwt) || null,
     user: null,
     climbs: [],
     filter: 'all'
@@ -45,11 +46,8 @@ var Store = new Vuex.Store({
     }
   },
   mutations: {
-    fetchUser: function (state) {
-      Cotacol.api.getUser().then(function (res) {
-        if (res.data.extra_data == null) res.data.extra_data = {};
-        if (!_.has(res.data.extra_data, "bookmarks")) res.data.extra_data.bookmarks = [];
-        if (!_.has(res.data.extra_data, "climbed")) res.data.extra_data.climbed = [];
+    fetchUser: function (state, jwt) {
+      Cotacol.api.getUser(jwt).then(function (res) {
         state.user = res.data;
       }).catch(function (err) {
         state.user = null;
@@ -71,14 +69,17 @@ var Store = new Vuex.Store({
 var UpdateUserListMixin = {
   methods: {
     updateUserList: function (userList, climbId) {
-      var idx = this.user.extra_data[userList].indexOf(climbId);
+      var idx = this.user[userList].indexOf(climbId);
 
       if (idx > -1) {
-        this.user.extra_data[userList].splice(idx, 1);
+        this.user[userList].splice(idx, 1);
       } else {
-        this.user.extra_data[userList].push(climbId);
+        this.user[userList].push(climbId);
       }
-      Cotacol.api.updateUser(this.user);
+
+      var data = {};
+      data[userList] = this.user[userList];
+      Cotacol.api.updateUser(data, this.jwt);
     }
   }
 }
@@ -127,11 +128,11 @@ var ClimbListView = {
           </q-slide-item>
         </template>
       </q-virtual-scroll>
-      <div v-show="filter == 'bookmarks' && !user.extra_data.bookmarks.length" class="q-pa-xl text-center">
+      <div v-show="filter == 'bookmarks' && !user.bookmarks.length" class="q-pa-xl text-center">
         <q-icon name="bookmark_border" size="xl" color="deep-orange-2" />
         <p class="text-body1 q-mt-lg">You don't have bookmarks.</p>
       </div>
-      <div v-show="filter == 'climbed' && !user.extra_data.climbed.length" class="q-pa-xl text-center">
+      <div v-show="filter == 'climbed' && !user.climbed.length" class="q-pa-xl text-center">
         <q-icon name="search_off" size="xl" color="deep-orange-2" />
         <p class="text-body1 q-mt-lg">Go out and ride!</p>
       </div>
@@ -257,17 +258,17 @@ var ClimbDetailView = {
   },
   props: ['id'],
   computed: _.extend(
-    Vuex.mapState(['climbs', 'user']), {
+    Vuex.mapState(['jwt', 'climbs', 'user']), {
     climb: function () {
       if (this.climbs.length == 0) return null;
       if (this.climbFull) return Object.freeze(this.climbFull);
       return Object.freeze(_.findWhere(this.climbs, {id: this.id}));
     },
     inBookmarks: function () {
-      return this.user && this.climb && this.user.extra_data.bookmarks.indexOf(this.climb.id) > -1;
+      return this.user && this.climb && this.user.bookmarks.indexOf(this.climb.id) > -1;
     },
     inClimbed: function () {
-      return this.user && this.climb && this.user.extra_data.climbed.indexOf(this.climb.id) > -1;
+      return this.user && this.climb && this.user.climbed.indexOf(this.climb.id) > -1;
     }
   }),
   methods: {
@@ -322,7 +323,11 @@ new Vue({
     };
   },
   computed: _.extend(
+    Vuex.mapState(['user', 'jwt']),
     Vuex.mapGetters(['filteredClimbs']), {
+    userIsAuthenticated: function () {
+      return this.jwt && this.jwt != null;
+    }
   }),
   methods: {
     goToClimb: function (climbId) {
@@ -331,7 +336,7 @@ new Vue({
   },
   created: function () {
     this.$store.commit('fetchClimbs');
-    this.$store.commit('fetchUser');
+    this.$store.commit('fetchUser', this.jwt);
     EventHub.$on('cotacol-map-select-climb', this.goToClimb);
   },
   beforeDestroy: function () {

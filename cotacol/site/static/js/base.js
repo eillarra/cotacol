@@ -1,4 +1,5 @@
 var COTACOL_HIGHLIGHT_COLOR = '#ff5722';
+var COTACOL_API_BASE_URL = 'https://api.cotacol.cc';
 
 document.body.style.setProperty('--q-color-primary', COTACOL_HIGHLIGHT_COLOR);
 
@@ -6,24 +7,31 @@ var EventHub = new Vue();
 
 var Cotacol = {
   api: {
-    request: function (method, url, data) {
+    request: function (method, url, data, headers) {
       return axios({
         method: method,
-        url: url,
-        data: data
+        url: COTACOL_API_BASE_URL + url,
+        data: data,
+        headers: headers
       });
     },
     getClimbs: function () {
-      return this.request('get', '/api/v1/climbs/');
+      return this.request('get', '/v1/climbs/');
     },
     getClimb: function (climbId) {
-      return this.request('get', '/api/v1/climbs/' + climbId + '/');
+      return this.request('get', '/v1/climbs/' + climbId + '/');
     },
-    getUser: function () {
-      return this.request('get', '/api/v1/user/');
+    getUser: function (jwt) {
+      if (!jwt) return;
+      return this.request('get', '/v1/users/me/', null, {
+        'Authorization': 'Bearer ' + jwt.access_token
+      });
     },
-    updateUser: function (user) {
-      return this.request('put', '/api/v1/user/', user);
+    updateUser: function (data, jwt) {
+      if (!jwt) return;
+      return this.request('patch', '/v1/users/me/', data, {
+        'Authorization': 'Bearer ' + jwt.access_token
+      });
     }
   },
   map: {

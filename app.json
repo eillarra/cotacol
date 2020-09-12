@@ -1,7 +1,6 @@
 {
   "scripts": {
     "dokku": {
-      "predeploy": "flask db upgrade && flask sync_db",
       "postdeploy": "flask clear_cache"
     }
   }
