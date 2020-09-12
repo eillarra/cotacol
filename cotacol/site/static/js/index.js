@@ -28,7 +28,7 @@ Vue.component('cotacol-climb-points', {
 
 var Store = new Vuex.Store({
   state: {
-    jwt: JSON.parse(document.querySelector('#jwt').dataset.jwt) || null,
+    jwt: JSON.parse(document.querySelector('#jwt').dataset.jwt || 'null'),
     user: null,
     climbs: [],
     filter: 'all'
