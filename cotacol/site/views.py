@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, send_from_directory
+import json
+
+from flask import Blueprint, redirect, request, render_template, send_from_directory, session, url_for
 from os import path
 
 
@@ -13,3 +15,15 @@ def favicon():
 @site.route("/")
 def index():
     return render_template("site/index.html")
+
+
+@site.route("/login/")
+def login():
+    session['jwt'] = json.dumps(request.args)
+    return redirect(url_for("site.index"))
+
+
+@site.route("/logout/")
+def logout():
+    session['jwt'] = "null"
+    return redirect(url_for("site.index"))

@@ -33,12 +33,12 @@
           </q-avatar>
           <q-menu class="width: 200px" :offset="[0, 25]">
             <div class="q-pa-md">
-              <q-btn flat type="a" href="{{ url_for('auth.logout') }}" color="grey-7"
+              <q-btn flat type="a" href="{{ url_for('site.logout') }}" color="grey-7"
                 label="Logout"></q-btn>
             </div>
           </q-menu>
         </q-btn>
-        <q-btn v-else type="a" href="{{ url_for('auth.login') }}" unelevated color="deep-orange" class="q-mr-sm">
+        <q-btn v-else type="a" href="https://api.cotacol.cc/auth/login/strava/?redirect_uri={{ url_for('site.login',_external=True) }}" unelevated color="deep-orange" class="q-mr-sm">
           <span>Connect <span v-show="$q.screen.gt.sm">with </span> Strava</span></q-btn>
       </q-toolbar>
     </q-header>

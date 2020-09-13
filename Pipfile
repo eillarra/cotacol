@@ -7,18 +7,13 @@ name = "pypi"
 python_version = "3.8"
 
 [packages]
-authlib = "*"
 environs = "*"
 flask = "*"
 flask-assets = "*"
 flask-caching = "*"
 flask-compress = "*"
 flask-cors = "*"
-flask-talisman = "*"
-geojson = "*"
-polyline = "*"
 redis = "*"
-requests = "*"
 
 [dev-packages]
 black = "==19.10b0"
@@ -29,3 +24,4 @@ lxml = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-sugar = "*"
+requests = "*"
